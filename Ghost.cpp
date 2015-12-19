@@ -1,178 +1,91 @@
-/* 
- * Based off Snowman sample 
- * by R. Teather
- */
 
 //#include <GLUT/glut.h>
 #include <gl/glut.h> 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+#include "Ghost.h"
 
-float cols[6][3] = { {1,0,0}, {0,1,1}, {1,1,0}, {0,1,0}, {0,0,1}, {1,0,1} };
+using namespace std;
 
-float pos[] = {0,9,0};
-float rot[] = {0, 0, 0};
-float camPos[] = {-25, 40, -25};
-float angle = 0.0f;
-
-/* drawPolygon - takes 4 indices and an array of vertices
- *   and draws a polygon using the vertices indexed by the indices
- */
-void drawPolygon(int a, int b, int c, int d, float v[8][3]){
-	glBegin(GL_POLYGON);
-		glVertex3fv(v[a]);
-		glVertex3fv(v[b]);
-		glVertex3fv(v[c]);
-		glVertex3fv(v[d]);
-	glEnd();
-}
-
-void drawAxis()
+Ghost::Ghost()
 {
-	glBegin(GL_LINES);
-		glColor3f(1, 0, 0);
-		glVertex3f(0,0,0);
-		glVertex3f(10,0,0);
-		glColor3f(0,1,0);
-		glVertex3f(0,0,0);
-		glVertex3f(0,10,0);
-		glColor3f(0,0,1);
-		glVertex3f(0,0,0);
-		glVertex3f(0,0,10);
-	glEnd();
-}
-
-/* cube - takes an array of 8 vertices, and draws 6 faces
- *  with drawPolygon, making up a box
- */
-void cube(float v[8][3])
-{
-	glColor3fv(cols[1]);
-	drawPolygon(0, 3, 2, 1, v);
-
-	glColor3fv(cols[2]);
-	drawPolygon(1, 0, 4, 5, v);
-
-	glColor3fv(cols[3]);
-	drawPolygon(5, 1, 2, 6, v);
-	
-	glColor3fv(cols[4]);
-	drawPolygon(2, 3, 7, 6, v);
-	
-	glColor3fv(cols[5]);
-	drawPolygon(6, 5, 4, 7, v);
-
-	glColor3fv(cols[0]);
-	drawPolygon(4, 0, 3, 7, v);
-}
-
-/* drawBox - takes centre point, width, height and depth of a box,
- *  calculates its corner vertices, and draws it with the cube function
- */
-void drawBox(float* c, float w, float h, float d)
-{
-	float vertices[8][3] = { {c[0]-w/2, c[1]-h/2, c[2]+d/2},
-							 {c[0]-w/2, c[1]+h/2, c[2]+d/2},
-							 {c[0]+w/2, c[1]+h/2, c[2]+d/2},
-							 {c[0]+w/2, c[1]-h/2, c[2]+d/2}, 
-							 {c[0]-w/2, c[1]-h/2, c[2]-d/2}, 
-							 {c[0]-w/2, c[1]+h/2, c[2]-d/2}, 
-							 {c[0]+w/2, c[1]+h/2, c[2]-d/2},
-							 {c[0]+w/2, c[1]-h/2, c[2]-d/2} };
-
-	cube(vertices);
+	bool status = true;
+	float pos[3] = {0.0, 9.0, 0.0};
+	float rot[3] = {0, 0, 0};
+	string dir = "forward";
 }
 
 
-void keyboard(unsigned char key, int x, int y)
+Ghost::Ghost(float x, float z)
 {
+	bool status = true;
+	float pos[3] = {x, 9.0, z};
+	float rot[3] = {0, 0, 0};
+	string dir = "forward";
+}
 
-	/* key presses move the cube, if it isn't at the extents (hard-coded here) */
-	switch (key)
+
+Ghost::Ghost(float x, float z, string startDir)
+{
+	bool status = true;
+	float pos[3] = {x, 9.0, z};
+
+	if(startDir == "forward")
 	{
-		case 'q':
-		case 27:
-			exit (0);
-			break;
+		float rot[] = {0, 0, 0};
+		string dir = startDir;
 
-		case 'a':
-		case 'A':
-			if(pos[0] > -11.9) // 4.4 = half of mapsize minus snowman body
-				pos[0] += 0.1;
-			rot[1] = 90;
-			break;
+	}else if(startDir == "left"){
 
-		case 'w':
-		case 'W':
-			if(pos[2] < 11.9)
-				pos[2] += 0.1;
-			rot[1] = 0;
-			
-			break;
+		float rot[] = {0, 90, 0};
+		string dir = startDir;
 
-		case 'd':
-		case 'D':
-			if(pos[0] < 11.9)
-				pos[0]-=0.1;
-			rot[1] = -90;
-			break;
+	}else if(startDir == "right"){
 
-		case 's':
-		case 'S':
-			if(pos[2] > -11.9)
-				pos[2] -= 0.1;
-			rot[1] = 180;
-			break;			
-	}
+		float rot[] = {0, -90, 0};
+		string dir = startDir;
 
-	glutPostRedisplay();
+	}else if(startDir == "backward"){
+
+		float rot[] = {0, 180, 0};
+		string dir = startDir;
+
+	} else{
+		// default case if given direction is incorrect
+		float rot[] = {0, 0, 0};
+		string dir = "forward";
+	}	
 }
 
-void special(int key, int x, int y)
+
+void Ghost::move(std::string moveDir)
 {
-	/* arrow key presses move the camera */
-	switch(key)
+	if(dir == "forward")
 	{
-		case GLUT_KEY_LEFT:
-			camPos[0]-= 2;
-			break;
+		rot[1] = 0;
+		pos[2] += 0.25;
 
-		case GLUT_KEY_RIGHT:
-			camPos[0]+= 2;
-			break;
+	}else if(dir == "left"){
 
-		case GLUT_KEY_UP:
-			camPos[2] -= 2;
-			break;
+		rot[1] = 90;
+		pos[0] += 0.25;
 
-		case GLUT_KEY_DOWN:
-			camPos[2] += 2;
-			break;
-		
-		case GLUT_KEY_HOME:
-			camPos[1] += 0.5;
-			break;
+	}else if(dir == "right"){
 
-		case GLUT_KEY_END:
-			camPos[1] -= 0.5;
-			break;
+		rot[1] = -90;
+		pos[0] -= 0.25;
+
+	}else if(dir == "backward"){
+
+		rot[1] = 180;
+		pos[2] -= 0.25;
 
 	}
-	
-	glutPostRedisplay();
 }
 
-void init(void)
-{
-	glClearColor(0, 0, 0, 0);
-	glColor3f(1, 1, 1);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45, 1, 1, 100);
-}
-
-void DrawSnowman(float* pos, float* rot)
+void Ghost::draw()
 {
 	glPushMatrix(); // ghost body
 
@@ -183,9 +96,7 @@ void DrawSnowman(float* pos, float* rot)
 	glutSolidSphere(5, 8, 8);
 
 
-
 	glPushMatrix(); // left eye
-
 	glTranslatef(-1.5, 1, 4);
 	glColor3f(0,0,0);
 	glutSolidSphere(1, 8, 8);
@@ -196,10 +107,11 @@ void DrawSnowman(float* pos, float* rot)
 	glutSolidSphere(0.3, 8, 8);
 	glPopMatrix();
 
-	glPopMatrix();
+
+	glPopMatrix(); // back to body coords
+
 
 	glPushMatrix(); // right eye
-
 	glTranslatef(1.5, 1, 4);
 	glColor3f(0,0,0);
 	glutSolidSphere(1, 8, 8);
@@ -210,14 +122,11 @@ void DrawSnowman(float* pos, float* rot)
 	glutSolidSphere(0.3, 8, 8);
 	glPopMatrix();
 
-	glPopMatrix();
-
+	glPopMatrix(); // back to body coords
 
 
 	glPushMatrix(); // ghost tail
-
 	glTranslatef(0.0, -5, 0.0);
-	
 	glColor3f(1,1,1);
 	glBegin(GL_POLYGON);
 
@@ -313,48 +222,8 @@ void DrawSnowman(float* pos, float* rot)
 	glPopMatrix();
 }
 
-
-/* display function - GLUT display callback function
- *		clears the screen, sets the camera position, draws the ground plane and movable box
- */
-void display(void)
-{
-	float origin[3] = {0,0,0};
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	gluLookAt(camPos[0], camPos[1], camPos[2], 0,0,0, 0,1,0);
-	glColor3f(1,1,1);
-
-	drawBox(origin, 25, 1, 25);
-	drawAxis();
-	DrawSnowman(pos, rot);
-	
-	glutSwapBuffers();
-}
-
-/* main function - program entry point */
 int main(int argc, char** argv)
 {
-	glutInit(&argc, argv);		//starts up GLUT
-	
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	
-	
-	glutInitWindowSize(800, 800);
-	glutInitWindowPosition(100, 100);
-
-	glutCreateWindow("Ghost Character");	//creates the window
-
-	glutDisplayFunc(display);	//registers "display" as the display callback function
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(special);
-
-	glEnable(GL_DEPTH_TEST);
-	init();
-
-	glutMainLoop();				//starts the event loop
-
-	return(0);					//return may not be necessary on all compilers
+	Ghost ghost = Ghost();
+	return(0);
 }
