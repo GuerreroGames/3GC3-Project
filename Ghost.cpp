@@ -3,8 +3,8 @@
  * by R. Teather
  */
 
-#include <GLUT/glut.h>
-//#include <gl/glut.h> 
+//#include <GLUT/glut.h>
+#include <gl/glut.h> 
 #include <stdio.h>
 #include <stdlib.h>
 
