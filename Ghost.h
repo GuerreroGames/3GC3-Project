@@ -11,6 +11,7 @@ public:
 	float scale;
 
 	Point3D tailPoints[37];
+	Point3D *pTailPoints;
 	bool vertNormsCalced;
 	Vector3D vertNorms[23];
 

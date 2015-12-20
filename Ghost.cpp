@@ -38,6 +38,7 @@ Ghost::Ghost()
 		Point3D(1.353, 0.381, 1.353), Point3D(1.913, 0.381, 0.0),
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
+	Point3D *pTailPoints = tailPoints;
 	bool vertNormsCalced = false;
 	Vector3D vertNorms[23];
 }
@@ -71,6 +72,7 @@ Ghost::Ghost(float x, float z, float scaleSize)
 		Point3D(1.353, 0.381, 1.353), Point3D(1.913, 0.381, 0.0),
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
+	Point3D *pTailPoints = tailPoints;
 	bool vertNormsCalced = false;
 	Vector3D vertNorms[23];
 }
@@ -101,6 +103,7 @@ Ghost::Ghost(float x, float z, float scaleSize, string startDir)
 		Point3D(1.353, 0.381, 1.353), Point3D(1.913, 0.381, 0.0),
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
+	Point3D *pTailPoints = tailPoints;
 	bool vertNormsCalced = false;
 	Vector3D vertNorms[23];
 
@@ -190,6 +193,7 @@ Vector3D Ghost::crossProd(Vector3D A, Vector3D B)
 Vector3D Ghost::createVec(Point3D A, Point3D B)
 { // points from A --> B
 	Vector3D vec = Vector3D(B.x-A.x, B.y-A.y, B.z-A.z);
+	//printf("vec: %f, %f, %f\n", vec.x, vec.y, vec.z);
 	return vec;
 }
 
@@ -206,9 +210,11 @@ void Ghost::calcVertNorms()
 	Vector3D B = Vector3D();
 
 /*****************************************************************************/
+	printf("tailPoints[0]: %f, %f, %f\n", pTailPoints[0].x, pTailPoints[0].y, pTailPoints[0].z);
 	A = createVec(tailPoints[0], tailPoints[23]);
 	B = createVec(tailPoints[0], tailPoints[36]);
 	NWfaceNorm = crossProd(A, B);
+
 
 	A = createVec(tailPoints[0], tailPoints[1]);
 	B = createVec(tailPoints[0], tailPoints[23]);
