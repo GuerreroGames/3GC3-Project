@@ -12,4 +12,16 @@ public:
 	float z;
 
 };
+
+class Point3D{
+public:
+
+	Point3D();
+	Point3D(float inX, float inY, float inZ);
+
+	float x;
+	float y;
+	float z;
+
+};
 #endif
