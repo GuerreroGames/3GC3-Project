@@ -6,6 +6,7 @@
 #include <gl/glut.h>
 #include <stdio.h>
 #include <string>
+#include <math.h>
 
 using namespace std;
 
@@ -18,13 +19,17 @@ float pos[] = {-3,1,+3};
 double viewPop[3];
 float rot[] = {0, 0, 0};
 float headRot[] = {0, 0, 0};
-float camPos[] = {0, 5, 12};
+//float camPos[] = {0, 5, 12};
+float camPos[] = {-5,10,14};
 float target[] = {0.0,0.0,0.0};
 float angle = 0.0f;
 int lumenenceValue[1];
 
 GLubyte* tex; //texture
+GLubyte* tex_sub; //sub texture
 int width, height, maxi;
+
+float x,y,tx,ty,xcos,ysin,radian,radius;
 
 //Temp storage stuff
 double modelViewMatrixStorage[16];
@@ -37,10 +42,18 @@ int cnt = 0;
 float eye[] = {5,5,5};
 
 /* LIGHTING */
-float light_pos[] = {4.0,10.0,4.0,1.0};
+float light_pos[] = {-1.0,15.0,-10.0,1.0};
 float amb0[4] = {1,1,1,1};
 float diff0[4] = {1,1,1,1};
 float spec0[4] = {1,1,1,1};
+float lightcutoff0 = 30.0;
+float  spotDir[] = { 0.0f, -1.0f, 0.0f };
+
+
+float light_pos1[] = {0.0,10.0,0.0,0.0};
+float amb01[4] = {0.1,0.1,0.1,1};
+float diff01[4] = {0.1,0.1,0.1,1};
+float spec01[4] = {0.1,0.1,0.1,1};
 
 /* MATERIALS */
 float m_amb_Wall[] = {1.0,1.0,1.0,1.0};
@@ -59,9 +72,14 @@ float shiny_Char = 1.0;
  */
 void drawPolygon(int a, int b, int c, int d, float v[8][3]){
 	glBegin(GL_POLYGON);
+		//draw map
+		glTexCoord2f(0.0, 1.0);
 		glVertex3fv(v[a]);
+		glTexCoord2f(1.0, 1.0);
 		glVertex3fv(v[b]);
+		glTexCoord2f(1.0, 0.0);
 		glVertex3fv(v[c]);
+		glTexCoord2f(0.0, 0.0);
 		glVertex3fv(v[d]);
 	glEnd();
 }
@@ -72,6 +90,7 @@ void drawPolygon(int a, int b, int c, int d, float v[8][3]){
 void cube(float v[8][3])
 {
 	glColor3fv(cols[1]);
+	
 	drawPolygon(0, 3, 2, 1, v);
 
 	glColor3fv(cols[2]);
@@ -105,14 +124,6 @@ void drawBox(float* c, float w, float h, float d) //([0,0,0],10,1,10)
     //set texture
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,w,h, 0, GL_RGB,GL_UNSIGNED_BYTE, tex);
 
-	//set texture properties
-
-	glColor3f(0,1,0);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
 
 	float vertices[8][3] = { {c[0]-w/2, c[1]-h/2, c[2]+d/2},
 							 {c[0]-w/2, c[1]+h/2, c[2]+d/2},
@@ -139,8 +150,8 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'a':
 		case 'A':
-			if(pos[0] > -4.4)
-				pos[0] -= 0.1;
+		//	if(pos[0] > -4.4)
+			pos[0] -= 1.3*0.1;
 			rot[1] = -90;
 			break;
 
@@ -153,23 +164,23 @@ void keyboard(unsigned char key, int x, int y)
 			//	camPos[2] = 8.1;
 			//	camPos[0] = 3.4;
 			//}
-			camPos[2] -= 0.1;
-			pos[2] -= 0.1;
+			//camPos[2] -= 0.1;
+			pos[2] -= 1.3*0.1;
 			rot[1] = 180;
 			break;
 
 		case 'd':
 		case 'D':
-			if(pos[0] < 4.4)
-				pos[0]+=0.1;
+			//if(pos[0] < 4.4)
+				pos[0]+=1.3*0.1;
 			rot[1] = 90;
 			break;
 
 		case 's':
 		case 'S':
-			if(pos[2] < 4.4)
-				camPos[2] += 0.1;
-				pos[2] += 0.1;
+			//if(pos[2] < 4.4)
+			//	camPos[2] += 0.1;
+				pos[2] += 1.3*0.1;
 			rot[1] = 0;
 			break;
 
@@ -296,7 +307,6 @@ void init(void)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//add texture code here!
-	glEnable(GL_TEXTURE_2D);
 	//load marble texture
 	//tex = LoadPPM("marble.ppm", &width, &height, &maxi);
 }
@@ -530,25 +540,79 @@ void display(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	gluLookAt(camPos[0], camPos[1], camPos[2], pos[0],pos[1],pos[2], 0,1,0);
+	gluLookAt(camPos[0], camPos[1], camPos[2], 0,0,0+0.3*pos[2], 0,1,0);
 	glColor3f(1,1,1);
 
 	glShadeModel(GL_SMOOTH);
 	glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
-	//glLightf(GL_LIGHT0,GL_SPOT_CUTOFF,20.0f);
+	glLightf(GL_LIGHT0,GL_SPOT_CUTOFF,10.0f);
+	glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spotDir);
     glLightfv(GL_LIGHT0, GL_AMBIENT, amb0);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diff0);
+   // glLightf(GL_LIGHT0,GL_SPOT_EXPONENT,100.0f);
     glLightfv(GL_LIGHT0, GL_SPECULAR, spec0);
+    
+    glPushMatrix();
+	glTranslatef(light_pos[0],light_pos[1],light_pos[2]);
+	glutSolidSphere(0.2, 12, 10);
+	glPopMatrix();
 
-	
+	glLightfv(GL_LIGHT1,GL_POSITION,light_pos1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, amb01);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diff01);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, spec01);
 
-	//DrawGhost(pos, rot);
-
-	
 	DrawGhost(pos, rot);
+	//Textures
+
+	glEnable(GL_TEXTURE_2D); 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex); 
+
+	//set texture properties
+
+	//glColor3f(0,1,0);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
 	drawBox(origin, 10, 1, 20);
 	drawBox(origin2,1,10,20);
 	drawBox(origin3,1,10,20);
+	glDisable(GL_TEXTURE_2D);
+	//draw the 2Dcircle on the ground
+	glEnable(GL_TEXTURE_2D); 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_sub); 
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glBegin(GL_POLYGON);
+	radius = (light_pos[1]-1)*(float)tan(lightcutoff0*M_PI/360.0f);
+	glNormal3f(0,1,0);
+    for (angle=0.0; angle<360.0; angle+=2.0)
+    {
+    	radian = angle * (M_PI /180.0f);
+
+		xcos = (float)cos(radian);
+		ysin = (float)sin(radian);
+		x = xcos * radius  + light_pos[0]; //need to change to center of spotlight, and size of spotlight
+		y = ysin * radius  + light_pos[2]; //need to change to center of spotlight, and size of spotlight
+		tx = xcos * 0.5 + 0.5;
+		ty = ysin * 0.5 + 0.5;
+		glTexCoord3f(tx,0.6, ty);
+		glVertex3f(x,0.6,y);
+	}
+
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+
+
+
 	//create a set of 4-5 pixels that exist on the character
 	// translate them with position and rotation
 	// check them at each step
@@ -597,13 +661,15 @@ int main(int argc, char** argv)
 
 	//image1 = LoadPPM("interface.ppm", &width, &height, &maxi);
 
-	tex = LoadPPM("marble.ppm", &width, &height, &maxi);
+	tex = LoadPPM("concrete.ppm", &width, &height, &maxi);
+	tex_sub = LoadPPM("concrete-light.ppm", &width, &height, &maxi);
 	/* LIGHTING */
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 
-	glEnable(GL_CULL_FACE); // Allows backface culling
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE); // Allows backface culling
+	//glCullFace(GL_BACK);
 
 
 	glutDisplayFunc(display);	//registers "display" as the display callback function
@@ -616,8 +682,8 @@ int main(int argc, char** argv)
 
 	//Textures
 
-	glEnable(GL_TEXTURE_2D); 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex); 
+	//glEnable(GL_TEXTURE_2D); 
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex); 
 
 	glutMainLoop();				//starts the event loop
 
