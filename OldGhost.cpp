@@ -351,7 +351,7 @@ void display(void)
 
 	gluLookAt(camPos[0], camPos[1], camPos[2], 0,0,0, 0,1,0);
 
-	drawBox(origin, 25, 1, 25);
+
 	drawAxis();
 	ghost.draw();
 	

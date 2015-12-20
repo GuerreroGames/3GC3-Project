@@ -54,11 +54,6 @@ Ghost::Ghost()
 
 	vertNormsCalced = false;
 	vertNorms[23];
-
-	for(int i=0; i<23; i++)
-	{
-		printf("tailPoints[%i]: %f, %f, %f\n", i, tailPoints[i].x, tailPoints[i].y, tailPoints[i].z);
-	}
 }
 
 
@@ -199,7 +194,6 @@ Vector3D Ghost::normAvg(Vector3D fNorm1, Vector3D fNorm2,
 
 	float magnitude = sqrt((vertNorm.x * vertNorm.x) + (vertNorm.y * vertNorm.y) + (vertNorm.z * vertNorm.z) ); 
  
-	printf("magnitude: %f\n", magnitude);
 	vertNorm = Vector3D(vertNorm.x / magnitude, 
 						vertNorm.y / magnitude,
 						vertNorm.z /magnitude);
@@ -219,7 +213,6 @@ Vector3D Ghost::crossProd(Vector3D A, Vector3D B)
 Vector3D Ghost::createVec(Point3D A, Point3D B)
 { // points from A --> B
 	Vector3D vec = Vector3D(B.x-A.x, B.y-A.y, B.z-A.z);
-	//printf("vec: %f, %f, %f\n", vec.x, vec.y, vec.z);
 	return vec;
 }
 
@@ -640,14 +633,16 @@ void Ghost::draw()
 	}
 
 	glPushMatrix(); // ghost body
-	
+
 	glScalef(scale, scale, scale);
 	glTranslatef(pos[0], pos[1], pos[2]);
 	glRotatef(rot[1], 0, 1, 0);
 
+	glPushMatrix(); // rotate body to upright position
 	glColor3f(1,1,1);
+	glRotatef(90, 1, 0, 0);
 	glutSolidSphere(5, 8, 8);
-
+	glPopMatrix(); // back to body coords
 	
 	glPushMatrix(); // left eye
 	glTranslatef(-1.5, 1, 4);
@@ -683,89 +678,157 @@ void Ghost::draw()
 	glColor3f(1,1,1);
 	glBegin(GL_QUADS);
 
+		glNormal3f(vertNorms[0].x, vertNorms[0].y, vertNorms[0].z);
 		glVertex3f(tailPoints[0].x, tailPoints[0].y, tailPoints[0].z); // p1
+		glNormal3f(vertNorms[3].x, vertNorms[3].y, vertNorms[3].z);
 		glVertex3f(tailPoints[3].x, tailPoints[3].y, tailPoints[3].z); // p4 
-		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p5
+		glNormal3f(vertNorms[4].x, vertNorms[4].y, vertNorms[4].z);
+		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
+		glNormal3f(vertNorms[1].x, vertNorms[1].y, vertNorms[1].z);
 		glVertex3f(tailPoints[1].x, tailPoints[1].y, tailPoints[1].z); // p2
 
+		glNormal3f(vertNorms[1].x, vertNorms[1].y, vertNorms[1].z);
 		glVertex3f(tailPoints[1].x, tailPoints[1].y, tailPoints[1].z); // p2
+		glNormal3f(vertNorms[4].x, vertNorms[4].y, vertNorms[4].z);
 		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
+		glNormal3f(vertNorms[5].x, vertNorms[5].y, vertNorms[5].z);
 		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
+		glNormal3f(vertNorms[2].x, vertNorms[2].y, vertNorms[2].z);
 		glVertex3f(tailPoints[2].x, tailPoints[2].y, tailPoints[2].z); // p3
 
+		glNormal3f(vertNorms[0].x, vertNorms[0].y, vertNorms[0].z);
 		glVertex3f(tailPoints[0].x, tailPoints[0].y, tailPoints[0].z); // p1
+		glNormal3f(vertNorms[6].x, vertNorms[6].y, vertNorms[6].z);
 		glVertex3f(tailPoints[6].x, tailPoints[6].y, tailPoints[6].z); // p7
+		glNormal3f(vertNorms[7].x, vertNorms[7].y, vertNorms[7].z);
 		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
-		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
+		glNormal3f(vertNorms[3].x, vertNorms[3].y, vertNorms[3].z);
+		glVertex3f(tailPoints[3].x, tailPoints[3].y, tailPoints[3].z); // p4
 
+		glNormal3f(vertNorms[5].x, vertNorms[5].y, vertNorms[5].z);
 		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
+		glNormal3f(vertNorms[9].x, vertNorms[9].y, vertNorms[9].z);
 		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
+		glNormal3f(vertNorms[10].x, vertNorms[10].y, vertNorms[10].z);
 		glVertex3f(tailPoints[10].x, tailPoints[10].y, tailPoints[10].z); // p11
+		glNormal3f(vertNorms[2].x, vertNorms[2].y, vertNorms[2].z);
 		glVertex3f(tailPoints[2].x, tailPoints[2].y, tailPoints[2].z); // p3
 
+		glNormal3f(vertNorms[3].x, vertNorms[3].y, vertNorms[3].z);
 		glVertex3f(tailPoints[3].x, tailPoints[3].y, tailPoints[3].z); // p4
+		glNormal3f(vertNorms[7].x, vertNorms[7].y, vertNorms[7].z);
 		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
+		glNormal3f(vertNorms[8].x, vertNorms[8].y, vertNorms[8].z);
 		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glNormal3f(vertNorms[4].x, vertNorms[4].y, vertNorms[4].z);
 		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
 
+		glNormal3f(vertNorms[4].x, vertNorms[4].y, vertNorms[4].z);
 		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
+		glNormal3f(vertNorms[8].x, vertNorms[8].y, vertNorms[8].z);
 		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glNormal3f(vertNorms[9].x, vertNorms[9].y, vertNorms[9].z);
 		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
+		glNormal3f(vertNorms[5].x, vertNorms[5].y, vertNorms[5].z);
 		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
 
+		glNormal3f(vertNorms[6].x, vertNorms[6].y, vertNorms[6].z);
 		glVertex3f(tailPoints[6].x, tailPoints[6].y, tailPoints[6].z); // p7
+		glNormal3f(vertNorms[11].x, vertNorms[11].y, vertNorms[11].z);
 		glVertex3f(tailPoints[11].x, tailPoints[11].y, tailPoints[11].z); // p12
+		glNormal3f(vertNorms[12].x, vertNorms[12].y, vertNorms[12].z);
 		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
+		glNormal3f(vertNorms[7].x, vertNorms[7].y, vertNorms[7].z);
 		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
 
+		glNormal3f(vertNorms[9].x, vertNorms[9].y, vertNorms[9].z);
 		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
+		glNormal3f(vertNorms[14].x, vertNorms[14].y, vertNorms[14].z);
 		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
-		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glNormal3f(vertNorms[15].x, vertNorms[15].y, vertNorms[15].z);
+		glVertex3f(tailPoints[15].x, tailPoints[15].y, tailPoints[15].z); // p14
+		glNormal3f(vertNorms[10].x, vertNorms[10].y, vertNorms[10].z);
 		glVertex3f(tailPoints[10].x, tailPoints[10].y, tailPoints[10].z); // p11
 
+		glNormal3f(vertNorms[7].x, vertNorms[7].y, vertNorms[7].z);
 		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
+		glNormal3f(vertNorms[12].x, vertNorms[12].y, vertNorms[12].z);
 		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
+		glNormal3f(vertNorms[13].x, vertNorms[13].y, vertNorms[13].z);
 		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
+		glNormal3f(vertNorms[8].x, vertNorms[8].y, vertNorms[8].z);
 		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
 
+		glNormal3f(vertNorms[8].x, vertNorms[8].y, vertNorms[8].z);
 		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glNormal3f(vertNorms[13].x, vertNorms[13].y, vertNorms[13].z);
 		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
+		glNormal3f(vertNorms[14].x, vertNorms[14].y, vertNorms[14].z);
 		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
+		glNormal3f(vertNorms[9].x, vertNorms[9].y, vertNorms[9].z);
 		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
 
+		glNormal3f(vertNorms[11].x, vertNorms[11].y, vertNorms[11].z);
 		glVertex3f(tailPoints[11].x, tailPoints[11].y, tailPoints[11].z); // p12
+		glNormal3f(vertNorms[16].x, vertNorms[16].y, vertNorms[16].z);
 		glVertex3f(tailPoints[16].x, tailPoints[16].y, tailPoints[16].z); // p17
+		glNormal3f(vertNorms[17].x, vertNorms[17].y, vertNorms[17].z);
 		glVertex3f(tailPoints[17].x, tailPoints[17].y, tailPoints[17].z); // p18
+		glNormal3f(vertNorms[12].x, vertNorms[12].y, vertNorms[12].z);
 		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
 
+		glNormal3f(vertNorms[14].x, vertNorms[14].y, vertNorms[14].z);
 		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
+		glNormal3f(vertNorms[19].x, vertNorms[19].y, vertNorms[19].z);
 		glVertex3f(tailPoints[19].x, tailPoints[19].y, tailPoints[19].z); // p20
+		glNormal3f(vertNorms[20].x, vertNorms[20].y, vertNorms[20].z);
 		glVertex3f(tailPoints[20].x, tailPoints[20].y, tailPoints[20].z); // p21
+		glNormal3f(vertNorms[15].x, vertNorms[15].y, vertNorms[15].z);
 		glVertex3f(tailPoints[15].x, tailPoints[15].y, tailPoints[15].z); // p16
 
+		glNormal3f(vertNorms[12].x, vertNorms[12].y, vertNorms[12].z);
 		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
+		glNormal3f(vertNorms[17].x, vertNorms[17].y, vertNorms[17].z);
 		glVertex3f(tailPoints[17].x, tailPoints[17].y, tailPoints[17].z); // p18
+		glNormal3f(vertNorms[18].x, vertNorms[18].y, vertNorms[18].z);
 		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glNormal3f(vertNorms[13].x, vertNorms[13].y, vertNorms[13].z);
 		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
 
+		glNormal3f(vertNorms[13].x, vertNorms[13].y, vertNorms[13].z);
 		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
+		glNormal3f(vertNorms[18].x, vertNorms[18].y, vertNorms[18].z);
 		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glNormal3f(vertNorms[19].x, vertNorms[19].y, vertNorms[19].z);
 		glVertex3f(tailPoints[19].x, tailPoints[19].y, tailPoints[19].z); // p20
+		glNormal3f(vertNorms[14].x, vertNorms[14].y, vertNorms[14].z);
 		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
 
+		glNormal3f(vertNorms[16].x, vertNorms[16].y, vertNorms[16].z);
 		glVertex3f(tailPoints[16].x, tailPoints[16].y, tailPoints[16].z); // p17
+		glNormal3f(vertNorms[21].x, vertNorms[21].y, vertNorms[21].z);
 		glVertex3f(tailPoints[21].x, tailPoints[21].y, tailPoints[21].z); // p22
+		glNormal3f(vertNorms[18].x, vertNorms[18].y, vertNorms[18].z);
 		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glNormal3f(vertNorms[17].x, vertNorms[17].y, vertNorms[17].z);
 		glVertex3f(tailPoints[17].x, tailPoints[17].y, tailPoints[17].z); // p18
 
+		glNormal3f(vertNorms[19].x, vertNorms[19].y, vertNorms[19].z);
 		glVertex3f(tailPoints[19].x, tailPoints[19].y, tailPoints[19].z); // p20
+		glNormal3f(vertNorms[18].x, vertNorms[18].y, vertNorms[18].z);
 		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glNormal3f(vertNorms[21].x, vertNorms[21].y, vertNorms[21].z);
 		glVertex3f(tailPoints[21].x, tailPoints[21].y, tailPoints[21].z); // p22
+		glNormal3f(vertNorms[20].x, vertNorms[20].y, vertNorms[20].z);
 		glVertex3f(tailPoints[20].x, tailPoints[20].y, tailPoints[20].z); // p21
 
+		glNormal3f(vertNorms[16].x, vertNorms[16].y, vertNorms[16].z);
 		glVertex3f(tailPoints[16].x, tailPoints[16].y, tailPoints[16].z); // p17
+		glNormal3f(vertNorms[22].x, vertNorms[22].y, vertNorms[22].z);
 		glVertex3f(tailPoints[22].x, tailPoints[22].y, tailPoints[22].z); // p23
+		glNormal3f(vertNorms[20].x, vertNorms[20].y, vertNorms[20].z);
 		glVertex3f(tailPoints[20].x, tailPoints[20].y, tailPoints[20].z); // p21
+		glNormal3f(vertNorms[21].x, vertNorms[21].y, vertNorms[21].z);
 		glVertex3f(tailPoints[21].x, tailPoints[21].y, tailPoints[21].z); // p22
 
 	glEnd();
