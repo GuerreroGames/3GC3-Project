@@ -3,10 +3,19 @@
  * by R. Teather
  */
 
-//#include <GLUT/glut.h>
-#include <gl/glut.h> 
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/freeglut.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "Ghost.h"
 
 float cols[6][3] = { {1,0,0}, {0,1,1}, {1,1,0}, {0,1,0}, {0,0,1}, {1,0,1} };
 
@@ -14,6 +23,13 @@ float pos[] = {0,9,0};
 float rot[] = {0, 0, 0};
 float camPos[] = {-25, 40, -25};
 float angle = 0.0f;
+
+float light_pos[] = {0,20,0,1};
+float amb[4]  = {1, 1, 1, 1};
+float diff[4] = {1, 1, 1, 1};
+float spec[4] = {1, 1, 1, 1};
+
+Ghost ghost;
 
 /* drawPolygon - takes 4 indices and an array of vertices
  *   and draws a polygon using the vertices indexed by the indices
@@ -97,32 +113,33 @@ void keyboard(unsigned char key, int x, int y)
 
 		case 'a':
 		case 'A':
-			if(pos[0] > -11.9) // 4.4 = half of mapsize minus snowman body
-				pos[0] += 0.1;
-			rot[1] = 90;
+			ghost.move("left");
 			break;
 
 		case 'w':
 		case 'W':
-			if(pos[2] < 11.9)
-				pos[2] += 0.1;
-			rot[1] = 0;
-			
+			ghost.move("forward");
 			break;
 
 		case 'd':
 		case 'D':
-			if(pos[0] < 11.9)
-				pos[0]-=0.1;
-			rot[1] = -90;
+			ghost.move("right");
 			break;
 
 		case 's':
 		case 'S':
-			if(pos[2] > -11.9)
-				pos[2] -= 0.1;
-			rot[1] = 180;
-			break;			
+			ghost.move("backward");
+			break;		
+
+		case 'z':
+		case 'Z':
+			camPos[1] += 0.5;
+			break;	
+
+		case 'x':
+		case 'X':
+			camPos[1] -= 0.5;
+			break;		
 	}
 
 	glutPostRedisplay();
@@ -148,15 +165,6 @@ void special(int key, int x, int y)
 		case GLUT_KEY_DOWN:
 			camPos[2] += 2;
 			break;
-		
-		case GLUT_KEY_HOME:
-			camPos[1] += 0.5;
-			break;
-
-		case GLUT_KEY_END:
-			camPos[1] -= 0.5;
-			break;
-
 	}
 	
 	glutPostRedisplay();
@@ -164,14 +172,20 @@ void special(int key, int x, int y)
 
 void init(void)
 {
+	glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
+
 	glClearColor(0, 0, 0, 0);
 	glColor3f(1, 1, 1);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45, 1, 1, 100);
-}
 
+}
+/*
 void DrawSnowman(float* pos, float* rot)
 {
 	glPushMatrix(); // ghost body
@@ -312,24 +326,34 @@ void DrawSnowman(float* pos, float* rot)
 
 	glPopMatrix();
 }
-
+*/
 
 /* display function - GLUT display callback function
  *		clears the screen, sets the camera position, draws the ground plane and movable box
  */
 void display(void)
-{
+{	
+
+	float m_amb[] = {0.3, 0.0, 0.0, 1.0};
+	float m_dif[] = {0.6, 0.0, 0.0, 1.0};
+	float m_spec[] = {0.8, 0.6, 0.6, 1.0};
+	float shiny = 27;
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m_amb);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_dif);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
+
 	float origin[3] = {0,0,0};
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	gluLookAt(camPos[0], camPos[1], camPos[2], 0,0,0, 0,1,0);
-	glColor3f(1,1,1);
 
 	drawBox(origin, 25, 1, 25);
 	drawAxis();
-	DrawSnowman(pos, rot);
+	ghost.draw();
 	
 	glutSwapBuffers();
 }
@@ -346,6 +370,12 @@ int main(int argc, char** argv)
 	glutInitWindowPosition(100, 100);
 
 	glutCreateWindow("Ghost Character");	//creates the window
+
+	ghost = Ghost();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glShadeModel(GL_SMOOTH);
 
 	glutDisplayFunc(display);	//registers "display" as the display callback function
 	glutKeyboardFunc(keyboard);

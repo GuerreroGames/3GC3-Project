@@ -1,24 +1,32 @@
-
-//#include <GLUT/glut.h>
-#include <gl/glut.h> 
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <GL/freeglut.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <string>
 #include <math.h>  
-
 #include "Ghost.h"
 #include "Vector3D.h"
 
 using namespace std;
 
+
 Ghost::Ghost()
 {
-	float pos[3] = {0.0, 9.0, 0.0};
-	float rot[3] = {0, 0, 0};
-	string dir = "forward";
-	float scale = 1;
+	pos[0] = 0.0; 	pos[1] = 9.0; 	pos[2] = 0.0;
+	rot[0] = 0.0; 	rot[1] = 0.0; 	rot[2] = 0.0;
 
-	Point3D tailPoints[37] = {
+	dir = "forward";
+	scale = 1;
+
+	Point3D tail[37] = {
 		Point3D(3.536, 5.0, -3.536), Point3D(0.0, 5.0, -5.0),
 		Point3D(-3.536, 5.0, -3.536), Point3D(2.337, 3.840, -4.006),
 		Point3D(0.0, 3.840, -5.471), Point3D(-2.337, 3.840, -4.006),
@@ -38,21 +46,31 @@ Ghost::Ghost()
 		Point3D(1.353, 0.381, 1.353), Point3D(1.913, 0.381, 0.0),
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
-	Point3D *pTailPoints = tailPoints;
-	bool vertNormsCalced = false;
-	Vector3D vertNorms[23];
+
+	for(int i=0; i<37; i++)
+	{
+		tailPoints[i] = tail[i];
+	}
+
+	vertNormsCalced = false;
+	vertNorms[23];
+
+	for(int i=0; i<23; i++)
+	{
+		printf("tailPoints[%i]: %f, %f, %f\n", i, tailPoints[i].x, tailPoints[i].y, tailPoints[i].z);
+	}
 }
 
 
 Ghost::Ghost(float x, float z, float scaleSize)
 {
-	float pos[3] = {x, 9.0, z};
-	float rot[3] = {0, 0, 0};
-	string dir = "forward";
-	float scale = scaleSize;
+	pos[0] = x; 	pos[1] = 9.0; 	pos[2] = z;
+	rot[0] = 0.0; 	rot[1] = 0.0; 	rot[2] = 0.0;
 
+	dir = "forward";
+	scale = scaleSize;
 
-	Point3D tailPoints[37] = {
+	Point3D tail[37] = {
 		Point3D(3.536, 5.0, -3.536), Point3D(0.0, 5.0, -5.0),
 		Point3D(-3.536, 5.0, -3.536), Point3D(2.337, 3.840, -4.006),
 		Point3D(0.0, 3.840, -5.471), Point3D(-2.337, 3.840, -4.006),
@@ -72,16 +90,21 @@ Ghost::Ghost(float x, float z, float scaleSize)
 		Point3D(1.353, 0.381, 1.353), Point3D(1.913, 0.381, 0.0),
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
-	Point3D *pTailPoints = tailPoints;
-	bool vertNormsCalced = false;
-	Vector3D vertNorms[23];
+
+	for(int i=0; i<37; i++)
+	{
+		tailPoints[i] = tail[i];
+	}
+
+	vertNormsCalced = false;
+	vertNorms[23];
 }
 
 
 Ghost::Ghost(float x, float z, float scaleSize, string startDir)
 {
-	float pos[3] = {x, 9.0, z};
-	float scale = scaleSize;
+	pos[0] = x; 	pos[1] = 9.0; 	pos[2] = z;
+	scale = scaleSize;
 
 	Point3D tailPoints[37] = {
 		Point3D(3.536, 5.0, -3.536), Point3D(0.0, 5.0, -5.0),
@@ -103,40 +126,43 @@ Ghost::Ghost(float x, float z, float scaleSize, string startDir)
 		Point3D(1.353, 0.381, 1.353), Point3D(1.913, 0.381, 0.0),
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
-	Point3D *pTailPoints = tailPoints;
-	bool vertNormsCalced = false;
-	Vector3D vertNorms[23];
+
+
+	vertNormsCalced = false;
+	vertNorms[23];
 
 	if(startDir == "forward")
 	{
-		float rot[] = {0, 0, 0};
-		string dir = startDir;
+		rot[0] = 0.0; 	rot[1] = 0.0; 	rot[2] = 0.0;
+		dir = startDir;
 
 	}else if(startDir == "left"){
 
-		float rot[] = {0, 90, 0};
-		string dir = startDir;
+		rot[0] = 0.0; 	rot[1] = 90.0; 	rot[2] = 0.0;
+		dir = startDir;
 
 	}else if(startDir == "right"){
 
-		float rot[] = {0, -90, 0};
-		string dir = startDir;
+		rot[0] = 0.0; 	rot[1] = -90.0; 	rot[2] = 0.0;
+		dir = startDir;
 
 	}else if(startDir == "backward"){
 
-		float rot[] = {0, 180, 0};
-		string dir = startDir;
+		rot[0] = 0.0; 	rot[1] = 180.0; 	rot[2] = 0.0;
+		dir = startDir;
 
 	} else{
 		// default case if given direction is incorrect
-		float rot[] = {0, 0, 0};
-		string dir = "forward";
+		rot[0] = 0.0; 	rot[1] = 0.0; 	rot[2] = 0.0;
+		dir = "forward";
 	}	
 }
 
 
 void Ghost::move(std::string moveDir)
 {
+	dir = moveDir;
+
 	if(dir == "forward")
 	{
 		rot[1] = 0;
@@ -210,7 +236,6 @@ void Ghost::calcVertNorms()
 	Vector3D B = Vector3D();
 
 /*****************************************************************************/
-	printf("tailPoints[0]: %f, %f, %f\n", pTailPoints[0].x, pTailPoints[0].y, pTailPoints[0].z);
 	A = createVec(tailPoints[0], tailPoints[23]);
 	B = createVec(tailPoints[0], tailPoints[36]);
 	NWfaceNorm = crossProd(A, B);
@@ -615,7 +640,7 @@ void Ghost::draw()
 	}
 
 	glPushMatrix(); // ghost body
-
+	
 	glScalef(scale, scale, scale);
 	glTranslatef(pos[0], pos[1], pos[2]);
 	glRotatef(rot[1], 0, 1, 0);
@@ -623,7 +648,7 @@ void Ghost::draw()
 	glColor3f(1,1,1);
 	glutSolidSphere(5, 8, 8);
 
-
+	
 	glPushMatrix(); // left eye
 	glTranslatef(-1.5, 1, 4);
 	glColor3f(0,0,0);
@@ -658,105 +683,120 @@ void Ghost::draw()
 	glColor3f(1,1,1);
 	glBegin(GL_QUADS);
 
-		glVertex3f(3.536, 5.0, -3.536); // p1
-		glVertex3f(2.337, 3.840, -4.006); // p4 
-		glVertex3f(0.0, 3.840, -5.471); // p5
-		glVertex3f(0.0, 5.0, -5.0); // p2
+		glVertex3f(tailPoints[0].x, tailPoints[0].y, tailPoints[0].z); // p1
+		glVertex3f(tailPoints[3].x, tailPoints[3].y, tailPoints[3].z); // p4 
+		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p5
+		glVertex3f(tailPoints[1].x, tailPoints[1].y, tailPoints[1].z); // p2
 
-		glVertex3f(0.0, 5.0, -5.0); // p2
-		glVertex3f(0.0, 3.840, -5.471); // p5
-		glVertex3f(-2.337, 3.840, -4.006); // p6
-		glVertex3f(-3.536, 5.0, -3.536); // p3
+		glVertex3f(tailPoints[1].x, tailPoints[1].y, tailPoints[1].z); // p2
+		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
+		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
+		glVertex3f(tailPoints[2].x, tailPoints[2].y, tailPoints[2].z); // p3
 
-		glVertex3f(3.536, 5.0, -3.536); // p1
-		glVertex3f(3.266, 3.087, -3.266); // p7
-		glVertex3f(1.009, 2.963, -6.363); // p8
-		glVertex3f(2.337, 3.840, -4.006); // p6
+		glVertex3f(tailPoints[0].x, tailPoints[0].y, tailPoints[0].z); // p1
+		glVertex3f(tailPoints[6].x, tailPoints[6].y, tailPoints[6].z); // p7
+		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
+		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
 
-		glVertex3f(-2.337, 3.840, -4.006); // p6
-		glVertex3f(-1.009, 2.963, -6.363); // p10
-		glVertex3f(-3.266, 3.087, -3.266); // p11
-		glVertex3f(-3.536, 5.0, -3.536); // p3
+		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
+		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
+		glVertex3f(tailPoints[10].x, tailPoints[10].y, tailPoints[10].z); // p11
+		glVertex3f(tailPoints[2].x, tailPoints[2].y, tailPoints[2].z); // p3
 
-		glVertex3f(2.337, 3.840, -4.006); // p4
-		glVertex3f(1.009, 2.963, -6.363); // p8
-		glVertex3f(0.0, 2.963, -7.716); // p9
-		glVertex3f(0.0, 3.840, -5.471); // p5
+		glVertex3f(tailPoints[3].x, tailPoints[3].y, tailPoints[3].z); // p4
+		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
+		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
 
-		glVertex3f(0.0, 3.840, -5.471); // p5
-		glVertex3f(0.0, 2.963, -7.716); // p9
-		glVertex3f(-1.009, 2.963, -6.363); // p10
-		glVertex3f(-2.337, 3.840, -4.006); // p6
+		glVertex3f(tailPoints[4].x, tailPoints[4].y, tailPoints[4].z); // p5
+		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
+		glVertex3f(tailPoints[5].x, tailPoints[5].y, tailPoints[5].z); // p6
 
-		glVertex3f(3.266, 3.087, -3.266); // p7
-		glVertex3f(2.5, 1.464, -2.5); // p12
-		glVertex3f(0.824, 1.454, -5.1); // p13
-		glVertex3f(1.009, 2.963, -6.363); // p8
+		glVertex3f(tailPoints[6].x, tailPoints[6].y, tailPoints[6].z); // p7
+		glVertex3f(tailPoints[11].x, tailPoints[11].y, tailPoints[11].z); // p12
+		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
+		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
 
-		glVertex3f(-1.009, 2.963, -6.363); // p10
-		glVertex3f(-0.824, 1.454, -5.1); // p15
-		glVertex3f(-2.5, 1.464, -2.5); // p9
-		glVertex3f(-3.266, 3.087, -3.266); // p11
+		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
+		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
+		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glVertex3f(tailPoints[10].x, tailPoints[10].y, tailPoints[10].z); // p11
 
-		glVertex3f(1.009, 2.963, -6.363); // p8
-		glVertex3f(0.824, 1.454, -5.1); // p13
-		glVertex3f(0.0, 1.454, -6.135); // p14
-		glVertex3f(0.0, 2.963, -7.716); // p9
+		glVertex3f(tailPoints[7].x, tailPoints[7].y, tailPoints[7].z); // p8
+		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
+		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
+		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
 
-		glVertex3f(0.0, 2.963, -7.716); // p9
-		glVertex3f(0.0, 1.454, -6.135); // p14
-		glVertex3f(-0.824, 1.454, -5.1); // p15
-		glVertex3f(-1.009, 2.963, -6.363); // p10
+		glVertex3f(tailPoints[8].x, tailPoints[8].y, tailPoints[8].z); // p9
+		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
+		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
+		glVertex3f(tailPoints[9].x, tailPoints[9].y, tailPoints[9].z); // p10
 
-		glVertex3f(2.5, 1.464, -2.5); // p12
-		glVertex3f(1.353, 0.381, -1.353); // p17
-		glVertex3f(0.605, 0.364, -3.261); // p18
-		glVertex3f(0.824, 1.454, -5.1); // p13
+		glVertex3f(tailPoints[11].x, tailPoints[11].y, tailPoints[11].z); // p12
+		glVertex3f(tailPoints[16].x, tailPoints[16].y, tailPoints[16].z); // p17
+		glVertex3f(tailPoints[17].x, tailPoints[17].y, tailPoints[17].z); // p18
+		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
 
-		glVertex3f(-0.824, 1.454, -5.1); // p15
-		glVertex3f(-0.605, 0.364, -3.261); // p20
-		glVertex3f(-1.353, 0.381, -1.353); // p21
-		glVertex3f(-2.5, 1.464, -2.5); // p16
+		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
+		glVertex3f(tailPoints[19].x, tailPoints[19].y, tailPoints[19].z); // p20
+		glVertex3f(tailPoints[20].x, tailPoints[20].y, tailPoints[20].z); // p21
+		glVertex3f(tailPoints[15].x, tailPoints[15].y, tailPoints[15].z); // p16
 
-		glVertex3f(0.824, 1.454, -5.1); // p13
-		glVertex3f(0.605, 0.364, -3.261); // p18
-		glVertex3f(0.0, 0.364, -3.821); // p19
-		glVertex3f(0.0, 1.454, -6.135); // p14
+		glVertex3f(tailPoints[12].x, tailPoints[12].y, tailPoints[12].z); // p13
+		glVertex3f(tailPoints[17].x, tailPoints[17].y, tailPoints[17].z); // p18
+		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
 
-		glVertex3f(0.0, 1.454, -6.135); // p14
-		glVertex3f(0.0, 0.364, -3.821); // p19
-		glVertex3f(-0.605, 0.364, -3.261); // p20
-		glVertex3f(-0.824, 1.454, -5.1); // p15
+		glVertex3f(tailPoints[13].x, tailPoints[13].y, tailPoints[13].z); // p14
+		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glVertex3f(tailPoints[19].x, tailPoints[19].y, tailPoints[19].z); // p20
+		glVertex3f(tailPoints[14].x, tailPoints[14].y, tailPoints[14].z); // p15
 
-		glVertex3f(1.353, 0.381, -1.353); // p17
-		glVertex3f(0.0, 0.0, -1.832); // p22
-		glVertex3f(0.0, 0.364, -3.821); // p19
-		glVertex3f(0.605, 0.364, -3.261); // p18
+		glVertex3f(tailPoints[16].x, tailPoints[16].y, tailPoints[16].z); // p17
+		glVertex3f(tailPoints[21].x, tailPoints[21].y, tailPoints[21].z); // p22
+		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glVertex3f(tailPoints[17].x, tailPoints[17].y, tailPoints[17].z); // p18
 
-		glVertex3f(-0.605, 0.364, -3.261); // p20
-		glVertex3f(0.0, 0.364, -3.821); // p19
-		glVertex3f(0.0, 0.0, -1.832); // p22
-		glVertex3f(-1.353, 0.381, -1.353); // p21
+		glVertex3f(tailPoints[19].x, tailPoints[19].y, tailPoints[19].z); // p20
+		glVertex3f(tailPoints[18].x, tailPoints[18].y, tailPoints[18].z); // p19
+		glVertex3f(tailPoints[21].x, tailPoints[21].y, tailPoints[21].z); // p22
+		glVertex3f(tailPoints[20].x, tailPoints[20].y, tailPoints[20].z); // p21
 
-		glVertex3f(1.353, 0.381, -1.353); // p17
-		glVertex3f(0.0, 0.0, 0.0); // p23
-		glVertex3f(-1.353, 0.381, -1.353); // p21
-		glVertex3f(0.0, 0.0, -1.832); // p22
+		glVertex3f(tailPoints[16].x, tailPoints[16].y, tailPoints[16].z); // p17
+		glVertex3f(tailPoints[22].x, tailPoints[22].y, tailPoints[22].z); // p23
+		glVertex3f(tailPoints[20].x, tailPoints[20].y, tailPoints[20].z); // p21
+		glVertex3f(tailPoints[21].x, tailPoints[21].y, tailPoints[21].z); // p22
 
 	glEnd();
 	
 	glPopMatrix();
-
+	
 	glPopMatrix();
+	
 }
-
+/*
 int main(int argc, char** argv)
 {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+
+	glutInitWindowSize(800, 800);
+	glutInitWindowPosition(100, 100);
+
+	glutCreateWindow("Ghost");
+
+
 	Ghost ghost = Ghost();
-	ghost.calcVertNorms();
-	for(int i=0; i<22; i++)
+	printf("vertNormsCalced: %i\n", ghost.vertNormsCalced );
+	ghost.draw();
+	printf("vertNormsCalced: %i\n\n", ghost.vertNormsCalced );
+
+	
+	for(int i=0; i<23; i++)
 	{
 		printf("vertNorms[%i] = %f, %f, %f\n", i, ghost.vertNorms[i].x, ghost.vertNorms[i].y, ghost.vertNorms[i].z);
 	}
+	
 	return(0);
-}
+}*/

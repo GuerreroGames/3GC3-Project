@@ -29,7 +29,7 @@ PROGRAM_NAME= Ghost
 run: $(PROGRAM_NAME)
 	./$(PROGRAM_NAME)$(EXEEXT)
 
-$(PROGRAM_NAME): Ghost.o Vector3D.o
+$(PROGRAM_NAME): OldGhost.o Ghost.o Vector3D.o
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 clean:
