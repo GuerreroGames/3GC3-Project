@@ -16,3 +16,17 @@ Vector3D::Vector3D(float inX, float inY, float inZ)
 	y = inY;
 	z = inZ;
 }
+
+Point3D::Point3D()
+{
+	x = 0.0;
+	y = 0.0;
+	z = 0.0;
+}
+
+Point3D::Point3D(float inX, float inY, float inZ)
+{
+	x = inX;
+	y = inY;
+	z = inZ;
+}
