@@ -333,7 +333,7 @@ void DrawSnowman(float* pos, float* rot)
  */
 void display(void)
 {	
-
+	
 	float m_amb[] = {0.3, 0.0, 0.0, 1.0};
 	float m_dif[] = {0.6, 0.0, 0.0, 1.0};
 	float m_spec[] = {0.8, 0.6, 0.6, 1.0};
@@ -343,7 +343,7 @@ void display(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m_dif);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_spec);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiny);
-
+	
 	float origin[3] = {0,0,0};
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);

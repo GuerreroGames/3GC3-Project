@@ -101,7 +101,7 @@ Ghost::Ghost(float x, float z, float scaleSize, string startDir)
 	pos[0] = x; 	pos[1] = 9.0; 	pos[2] = z;
 	scale = scaleSize;
 
-	Point3D tailPoints[37] = {
+	Point3D tail[37] = {
 		Point3D(3.536, 5.0, -3.536), Point3D(0.0, 5.0, -5.0),
 		Point3D(-3.536, 5.0, -3.536), Point3D(2.337, 3.840, -4.006),
 		Point3D(0.0, 3.840, -5.471), Point3D(-2.337, 3.840, -4.006),
@@ -122,6 +122,10 @@ Ghost::Ghost(float x, float z, float scaleSize, string startDir)
 		Point3D(3.536, 1.464, 0.0), Point3D(4.619, 3.087, 0.0),
 		Point3D(5.0, 5.0, 0.0) };
 
+	for(int i=0; i<37; i++)
+	{
+		tailPoints[i] = tail[i];
+	}
 
 	vertNormsCalced = false;
 	vertNorms[23];
